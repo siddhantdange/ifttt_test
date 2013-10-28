@@ -1,0 +1,13 @@
+
+extends layout
+
+block content
+	form#formUpdateUser(name="updateuser",method="post",action="/updateuseraction")
+		select#inputUser(name="userselect")
+			each user in users
+				option #{user['name']}
+		input#inputUserEmail(type="text", placeholder="email", name="useremail")
+		br
+		textarea#inputUserTeams(type="text", placeholder="separate teams by commas with no spaces!", name="userteams")
+		br
+		button#btnSubmit(type="submit") update

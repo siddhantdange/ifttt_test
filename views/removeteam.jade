@@ -1,0 +1,9 @@
+
+extends layout
+
+block content
+	form#formRemoveTeam(name="removeteam",method="post",action="/removeteamaction")
+		select#inputTeam(name="teamselector")
+			each team in teams
+				option #{team}
+		button#btnSubmit(type="submit") remove

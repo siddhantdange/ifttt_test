@@ -4,7 +4,7 @@
  */
 
 exports.index = function(req, res){
-	res.render('index', {title: 'Express: Main'});
+	res.render('index', {title: 'Sid\'s IFTTT project'});
 };
 
 exports.userlist = function(db){
@@ -157,3 +157,134 @@ exports.adduser = function(db){
 		});
 	}	
 };
+
+exports.updateuser = function(db){
+	return function(req, res){
+		var collection = db.get('ifttt.people');
+		collection.find({},{},function(e, docs){
+			res.render('updateuser', {'users' : docs});
+		});
+	}
+}
+
+exports.updateuseraction = function(db){
+	return function(req, res){
+		var collection = db.get('ifttt.people');
+		
+		var personName = req.body.userselect;
+		var newEmail = req.body.useremail;
+		var newTeamsStr = req.body.userteams;
+		var validData = false;
+		
+		var updateData = new Array();
+		if(newEmail && newEmail.length > 0){
+			updateData['email'] = newEmail;
+			validData = true;
+		}
+		
+		if(newTeamsStr && newTeamsStr.trim().length > 0){
+			
+			//parse teams into array
+			var newTeamsArr = new Array();
+			if(newTeamsStr.indexOf(',') != -1){
+				newTeamsArr = newTeamsStr.split(',');
+				
+				for(str in newTeamsArr){
+					str = str.trim().toLowerCase();
+				}
+			} else{
+				newTeamsArr = [newTeamsStr.trim().toLowerCase()];
+			}
+			
+			updateData['teams'] = newTeamsArr.slice(0);
+			validData = true;
+		}
+			
+		//if there's data to update, find person and update information
+		if(validData){
+			collection.find({
+				'name' : personName
+			},{},function(e, docs){
+				updateData['name'] = personName;
+				
+				if(!updateData['teams']){
+					updateData['teams'] = docs[0]['teams'];
+				}
+				
+				collection.update({
+				'name' : personName
+				}, 
+				updateData);
+			});
+		}
+		res.redirect('updateuser');
+		res.location('updateuser');
+	}
+}
+
+exports.removeuser = function(db){
+	return function(req, res){
+		var collection = db.get('ifttt.people');
+		collection.find({},{},function(e, docs){
+			res.render('removeuser', {'users' : docs});
+		});
+	}
+}
+
+exports.removeuseraction = function(db){
+	return function(req, res){
+		var selectedName = req.body.userselector;
+		console.log('selected: ' + selectedName);
+		
+		var collection = db.get('ifttt.people');
+		collection.remove({ 'name' : selectedName});
+		res.redirect('removeuser');
+		res.location('removeuser');
+	}
+}
+
+exports.removeteam = function(db){
+	return function(req, res){
+		var collection = db.get('ifttt.people');
+		collection.find({},{},function(e, docs){
+				
+			//setup names under teams
+			var teams = new Array();
+			
+			//map out teams -> people
+			for(var i = 0; i < docs.length; i++){
+				for(var j = 0; j < docs[i]["teams"].length; j++){
+					if(teams.indexOf(docs[i]['teams'][j]) == -1){
+						teams.push(docs[i]["teams"][j]);
+					}
+				}
+			}
+			
+			for(team in teams){
+				console.log(JSON.stringify(team));
+			}	
+							
+			res.render('removeteam', {'teams' : teams});
+		});
+	}
+}
+
+exports.removeteamaction = function(db){
+	return function(req, res){
+		var team = req.body.teamselector;
+		console.log('team: ' + team);
+		
+		var collection = db.get('ifttt.people');
+		collection.update({
+			'teams' : team
+		}, {
+			$pull: { 'teams': team }
+		}, { 
+			multi: true
+		});
+		
+		res.redirect('removeteam');
+		res.redirect('removeteam');
+	}
+}
+

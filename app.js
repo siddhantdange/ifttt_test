@@ -38,8 +38,14 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/userlist', routes.userlist(db));
 app.get('/newuser', routes.newuser);
+app.get('/updateuser', routes.updateuser(db));
+app.get('/removeuser', routes.removeuser(db));
+app.get('/removeteam', routes.removeteam(db));
 
 app.post('/adduser', routes.adduser(db));
+app.post('/updateuseraction', routes.updateuseraction(db));
+app.post('/removeuseraction', routes.removeuseraction(db));
+app.post('/removeteamaction', routes.removeteamaction(db));
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

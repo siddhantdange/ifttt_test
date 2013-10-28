@@ -1,0 +1,9 @@
+
+extends layout
+
+block content
+	form#formRemoveUser(name="removeuser",method="post",action="/removeuseraction")
+		select#inputUser(name="userselector")
+			each user in users
+				option #{user['name']}
+		button#btnSubmit(type="submit") remove
