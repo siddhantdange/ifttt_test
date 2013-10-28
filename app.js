@@ -8,10 +8,11 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
+var mongoose = require('mongoose');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/ifttt_test');
+var db = monk('localhost:27017/test');
 
 var app = express();
 
